@@ -34,6 +34,7 @@ class AuthenticationService @Inject()(ws: WSClient, configuration: Configuration
                 Left(new RuntimeException("Could not parse the response " + invalid.toString()))
               },
               aeCredential => {
+                bearerToken = aeCredential.token
                 Right(aeCredential.token)
               }
             )
@@ -42,17 +43,20 @@ class AuthenticationService @Inject()(ws: WSClient, configuration: Configuration
       }}
   }
 
-  def getBearerToken(): String = {
+  def getBearerToken(): Future[String] = {
     if (bearerToken.equals("")) {
       authenticate() map { response =>
         response match {
-          case Right(value) => bearerToken = value
-          case Left(error) => throw error
+          case Right(value) => {
+            bearerToken = value
+          }
+          case Left(error) => {
+            throw error
+          }
         }
       }
-
     }
-    bearerToken
+    Future.successful(bearerToken)
   }
 
 }

@@ -1,4 +1,4 @@
-GET     /search/:term                           controllers.PhotoController.search(term: String)
+GET     /search/:term                           controllers.SearchController.search(term: String)
 
 
       

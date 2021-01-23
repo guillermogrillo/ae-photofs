@@ -23,7 +23,7 @@ class ImagesRefreshTask @Inject()(actorSystem: ActorSystem, @Named("images-refre
 
 }
 
-class ImagesRefresherActor @Inject()(photoService: PhotoService) extends Actor {
+class ImagesRefresherActor @Inject()(photoService: ImageService) extends Actor {
   def receive = {
     case "refresh" => photoService.refreshAllImages()
   }
