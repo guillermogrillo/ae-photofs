@@ -1,6 +1,6 @@
 GET     /search/:term                           controllers.SearchController.search(term: String)
 
-GET     /refresh                                controllers.SearchController.refresh
+#GET     /refresh                                controllers.SearchController.refresh
 
 
       

@@ -7,6 +7,6 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class ApplicationStart @Inject()(authenticationService: AuthenticationService) {
 
-    authenticationService.authenticate()
+//    authenticationService.authenticate()
 
 }

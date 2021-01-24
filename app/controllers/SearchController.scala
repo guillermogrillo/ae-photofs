@@ -26,9 +26,9 @@ class SearchController @Inject()(searchService: SearchService,
 
   }
 
-  def refresh() = Action { implicit request =>
-    imageService.refreshAllImages()
-    Ok
-  }
+//  def refresh() = Action { implicit request =>
+//    imageService.refreshAllImages()
+//    Ok
+//  }
 
 }

@@ -20,6 +20,7 @@ class ImageService @Inject()(externalPhotoService: ExternalPhotoService, authent
     logger.info("I am refreshing images")
 
     for {
+      token <- EitherT(authenticationService.authenticate())
       response <- EitherT(externalPhotoService.getImagesPage(0))
       _ <- EitherT(handlePages(response.pageCount))
     } yield()
