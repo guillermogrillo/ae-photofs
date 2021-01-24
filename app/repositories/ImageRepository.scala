@@ -14,10 +14,10 @@ class ImageRepository {
   def search(term: String) = {
     Try {
       images.filter(i =>
-        i.id.toLowerCase.contains(term) ||
-          i.author.toLowerCase.contains(term) ||
-          i.camera.toLowerCase.contains(term) ||
-          i.tags.toLowerCase.contains(term)
+        i.id.toLowerCase.contains(term.toLowerCase) ||
+          i.author.toLowerCase.contains(term.toLowerCase) ||
+          i.camera.toLowerCase.contains(term.toLowerCase) ||
+          i.tags.toLowerCase.contains(term.toLowerCase)
       ).toList
     }.toEither
 

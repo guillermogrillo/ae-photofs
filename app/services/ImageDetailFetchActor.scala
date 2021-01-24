@@ -13,19 +13,19 @@ class ImageDetailFetchActor @Inject()(externalPhotoService: ExternalPhotoService
   override def receive: Receive = {
     case FetchDetails(imagesPage) =>
       logger.info(s"I am the actor in charge of searching the details in page ${imagesPage.page}")
-      imagesPage.pictures.foreach(p => {
-        for {
-          imageInfoResponse <- Future.successful(externalPhotoService.getImageInfo(p.id))
-          result <- imageInfoResponse map { response =>
-            response match {
-              case Left(ex) =>
-                logger.error("Error fetching image info" , ex)
-              case Right(image) =>
-                Future.successful(imageRepository.add(image))
-            }
-          }
-        } yield()
-      })
+//      imagesPage.pictures.foreach(p => {
+//        for {
+//          imageInfoResponse <- Future.successful(externalPhotoService.getImageInfo(p.id))
+//          result <- imageInfoResponse map { response =>
+//            response match {
+//              case Left(ex) =>
+//                logger.error("Error fetching image info" , ex)
+//              case Right(image) =>
+//                Future.successful(imageRepository.add(image))
+//            }
+//          }
+//        } yield()
+//      })
   }
 }
 

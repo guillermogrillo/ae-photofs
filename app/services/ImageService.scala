@@ -6,30 +6,46 @@ import services.ImageDetailFetchActor.FetchDetails
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import cats.data.EitherT
+import cats.implicits._
+import models.ImagesPage
+import repositories.ImageRepository
 
-class ImageService @Inject()(externalPhotoService: ExternalPhotoService, actorSystem: ActorSystem)(implicit ec: ExecutionContext) extends Logging {
+import scala.util.Try
+
+class ImageService @Inject()(externalPhotoService: ExternalPhotoService, authenticationService: AuthenticationService, imageRepository: ImageRepository, actorSystem: ActorSystem)(implicit ec: ExecutionContext) extends Logging {
+
 
   def refreshAllImages() = {
-    println("I am refreshing images")
-    var hasMore = true
-    var iteration = 0
-    while (hasMore) {
+    logger.info("I am refreshing images")
+
+    for {
+      response <- EitherT(externalPhotoService.getImagesPage(0))
+      _ <- EitherT(handlePages(response.pageCount))
+    } yield()
+    logger.info("Refreshing task finished")
+  }
+
+  def handlePages(totalPages: Int): Future[Either[Throwable, Unit]] = {
+    for (i <- 0 to totalPages) {
       for {
-        pageResponse <- externalPhotoService.getImagesPage(iteration)
-        _ <-
-          pageResponse match {
-            case Left(ex) =>
-              logger.error(s"Error while searching page info with iteration $iteration", ex)
-              Future.successful(Right())
-            case Right(page) =>
-              hasMore = page.hasMore
-              iteration += 1
-              val imageDetailFetcherActor = actorSystem.actorOf(ImageDetailFetchActor.props, "image-detail-fetch-actor" )
-              imageDetailFetcherActor ! FetchDetails(page)
-              Future.successful(Right())
-          }
-      } yield()
+        pageResponse <- EitherT(externalPhotoService.getImagesPage(i))
+        _ <- EitherT(handlePage(pageResponse))
+      } yield ()
     }
+    Future.successful(Right(()))
+  }
+
+  def handlePage(imagesPage: ImagesPage): Future[Either[Throwable, Unit]] = Future {
+    //    Future.successful(Right(actorSystem.actorOf(ImageDetailFetchActor.props, "image-detail-fetcher" ) ! FetchDetails(imagesPage)))
+    Try {
+      imagesPage.pictures.foreach(p => {
+        for {
+          image <- EitherT(externalPhotoService.getImageInfo(p.id))
+          _ <- EitherT(Future.successful(imageRepository.add(image)))
+        } yield ()
+      })
+    }.toEither
   }
 
 }

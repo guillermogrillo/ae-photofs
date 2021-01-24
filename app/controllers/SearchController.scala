@@ -2,7 +2,7 @@ package controllers
 
 import play.api.Logging
 import play.api.mvc.{AbstractController, ControllerComponents}
-import services.SearchService
+import services.{ImageService, SearchService}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
@@ -10,7 +10,8 @@ import play.api.libs.json.Json
 
 
 @Singleton
-class SearchController @Inject()(searchService: SearchService)(cc: ControllerComponents)(implicit ex: ExecutionContext) extends AbstractController(cc) with Logging {
+class SearchController @Inject()(searchService: SearchService,
+                                 imageService: ImageService)(cc: ControllerComponents)(implicit ex: ExecutionContext) extends AbstractController(cc) with Logging {
 
   def search(term: String) = Action.async { implicit request =>
     logger.info(s"Received a request to search images by term $term")
@@ -25,6 +26,9 @@ class SearchController @Inject()(searchService: SearchService)(cc: ControllerCom
 
   }
 
-
+  def refresh() = Action { implicit request =>
+    imageService.refreshAllImages()
+    Ok
+  }
 
 }
